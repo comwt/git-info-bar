@@ -1,0 +1,30 @@
+### BASH-GIT-VERSION: 1.0.0 #BASH-GIT
+function Func_GitCheck() { #BASH-GIT
+ #BASH-GIT
+    l_hlt="\033[30;47m" #(highlight)   white background/black foreground #BASH-GIT
+    l_nor="\033[34m"    #(normal info) blue foreground #BASH-GIT
+    l_maj="\033[41;37m" #(major info)  red background/white foreground #BASH-GIT
+    l_rst="\033[0m"     #(reset)       original terminal colors #BASH-GIT
+ #BASH-GIT
+    l_git_branch=$(git branch 2>/dev/null|awk '$1 == "*" {print $2}') #BASH-GIT
+ #BASH-GIT
+    if [[ ${l_git_branch} != "" ]]; then #BASH-GIT
+        if [[ ${l_git_branch} == "master" ]]; then #BASH-GIT
+            l_git_branch="${l_maj}${l_git_branch}${l_hlt}" #BASH-GIT
+        else #BASH-GIT
+            l_git_branch="${l_nor}${l_git_branch}${l_hlt}" #BASH-GIT
+        fi #BASH-GIT
+        l_git_sha1=$(git branch --verbose 2>/dev/null|awk '$1 == "*" {print $3}') #BASH-GIT
+        git status 2>&1 | grep "working directory clean" >/dev/null #BASH-GIT
+        if [[ $? -ne 0 ]]; then #BASH-GIT
+            l_git_sha1="${l_maj}${l_git_sha1}${l_hlt}" #BASH-GIT
+            l_chg="    *** You have uncommitted changes ***" #BASH-GIT
+        else #BASH-GIT
+            l_git_sha1="${l_nor}${l_git_sha1}${l_hlt}" #BASH-GIT
+            l_chg="" #BASH-GIT
+        fi #BASH-GIT
+        printf "${l_hlt}    BRANCH: ${l_git_branch}      (${l_git_sha1})${l_chg}    ${l_rst}" #BASH-GIT
+    fi #BASH-GIT
+ #BASH-GIT
+} #BASH-GIT
+PS1="\n$PS1\n\$(Func_GitCheck)\n$" #BASH-GIT
