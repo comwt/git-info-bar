@@ -1,4 +1,5 @@
 ### BASH-GIT-VERSION: 1.0.0 #BASH-GIT
+### Source URL: https://github.com/comwt/bash-git #BASH-GIT
 function Func_GitCheck() { #BASH-GIT
  #BASH-GIT
     l_hlt="\033[30;47m" #(highlight)   white background/black foreground #BASH-GIT
