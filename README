@@ -1,0 +1,1 @@
+Not a fork of bash-git-prompt.  This provides a simple function to add to your .bashrc file along with a PS1 revision, which together give a fast and pronounced view of various git attributes, when you are under the umbrella of a git repository.
