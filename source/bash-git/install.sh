@@ -24,41 +24,40 @@
 
 cd $(dirname $0)
 ld_base=$PWD
-l_version=$(awk '/BASH-GIT-VERSION/ {print $3}' plugin)
+ld_dest="${HOME}/.bash-git"
 
-function Run {
-    l_out=$($1 2>&1 3>&1)
-    if [[ $? -ne 0 ]]; then
-        printf "FAILED!\nERROR: $1\n${l_out}"
-        exit 101
-    fi
-}
+. ${ld_base}/lib/shell/global_functions
 
+#- Version 1.0.0 was placed in-line into .bashrc
+#  Later versions have their own home directory, thus the second test, if the first fails
+#-----------------------------------------------------------------------------------------
 l_installed_version=$(awk '/BASH-GIT-VERSION/ {print $3}' ~/.bashrc)
 if [[ ${l_installed_version} != "" ]]; then
-    echo "Found bash-git (version: ${l_installed_version})"
-    printf "Are you sure you want to overwrite it? (y/n): "
-    read l_answ
-    if [[ $(echo ${l_answ} | grep -c -i "^y") -lt 1 ]]; then
-        echo "Aborted."
-        exit 100
+    Uninstall "${l_installed_version}"
+else
+    if [ -f "${ld_dest}/VERSION" ]; then
+        l_installed_version=$(awk '{print $1}' ${ld_dest}/VERSION)
+        if [[ ${l_installed_version} != "" ]]; then
+            Uninstall "${l_installed_version}"
+        fi
     fi
+fi
 
-    printf "Removing previous version ... "
-    l_out=`sed '/#BASH-GIT$/d' ${HOME}/.bashrc >${ld_base}/bashrc.sed.out`
+l_version=$(awk '{print $1}' VERSION)
+printf "Installing bash-git (version ${l_version}) ... "
+if [ ! -d '${ld_dest}' ]; then
+    Run "mkdir ${ld_dest}"
+fi
+Run "cp ${ld_base}/License ${ld_dest}/"
+Run "cp ${ld_base}/plugin ${ld_dest}/"
+Run "cp ${ld_base}/VERSION ${ld_dest}/"
+grep "^\. ~/.bash-git/plugin" ${HOME}/.bashrc 1>/dev/null
+if [[ $? -ne 0 ]]; then
+    echo ". ~/.bash-git/plugin" >>${HOME}/.bashrc
     if [[ $? -ne 0 ]]; then
         printf "FAILED!\nERROR: $1\n${l_out}"
         exit 101
     fi
-    Run "cp ${ld_base}/bashrc.sed.out ${HOME}/.bashrc"
-    echo DONE
-fi
-
-printf "Installing bash-git (version ${l_version}) ... "
-l_out=`cat ${ld_base}/plugin >>${HOME}/.bashrc`
-if [[ $? -ne 0 ]]; then
-    printf "FAILED!\nERROR: $1\n${l_out}"
-    exit 101
 fi
 echo DONE
 
