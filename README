@@ -1,9 +1,10 @@
-This BASH shelll plugin endeavors to provide a fast and pronounced view of various git attributes when you are under the umbrella of a git repository.  Its main feature, the 'info bar' (information bar), displays the following information:
+git-info-bar is a shell plugin that endeavors to provide a fast and pronounced (highly visible) view of various git attributes when you are under the umbrella of a git repository.  Its main feature, the 'info bar' (information bar), displays the following:
 
     - current branch (in 'red' if on master)
-    - current cksum (in 'red' if there are uncommitted changes
-      and displays an 'uncommitted changes' message in the message
-      area)
+    - current cksum (in 'red' if there are uncommitted changes and
+      displays an 'uncommitted changes' message in the message area)
     - stash count in the message area if you have stashes
 
-Please see the license under source/bash-git.
+The info bar is only displayed when you are in a git repository's path.
+
+Please see the license under source/git-info-bar.
