@@ -33,12 +33,17 @@ lf_plugin=
 l_shell=`echo ${SHELL} | awk -F'/' '{print $NF}'`
 
 l_out=`/usr/bin/env perl -e 'use 5.4.0'` #require minimum of Perl 5.4
-l_out=`fakecmd123` #require minimum of Perl 5.4
+#l_out=`fakecmd123` #require minimum of Perl 5.4
 if [[ $? -ne 0 ]]; then
     echo "[WARN] Missing dependency -> Perl 5.4.0 or greater"
-    if [[ ${l_shell} != "bash" && ${l_shell} != "ksh" ]]; then
-        echo "Bash is the only supported SHELL at this time."
+    if [[ ${l_shell} != "bash" && ${l_shell} != "ksh" && ${l_shell} != "sh" ]]; then
+        echo "Bash, ksh93 and gitbash (for MS Windows) are the only supported shells at this time."
         exit 101
+    elif [[ ${l_shell} == "sh" ]]; then
+        if [[ ! -s ${OS} || $(echo ${OS} | grep -ic "Windows") -eq 0 ]]; then
+            echo "Bash, ksh93 and gitbash (for MS Windows) are the only supported shells at this time."
+            exit 101
+        fi
     fi
     echo "[WARN] Using SHELL plugin, rather than Perl based plugin"
     lf_plugin="plugin.shell"
@@ -53,9 +58,9 @@ fi
 #-----------------------------------------------------------------------------------------
 l_profile=
 case "${l_shell}" in
-    bash ) l_profile=".bashrc"  ;;
-    ksh  ) l_profile=".profile" ;;
-    zsh  ) l_profile=".zshrc"   ;;
+    bash   ) l_profile=".bashrc"  ;;
+    ksh|sh ) l_profile=".profile" ;;
+    zsh    ) l_profile=".zshrc"   ;;
 esac
 l_installed_version=`awk '/BASH-GIT-VERSION/ {print $3}' ~/${l_profile}`
 if [[ ${l_installed_version} != "" ]]; then
@@ -114,29 +119,30 @@ fi
 #Run "cp ${ld_base}/${lf_plugin} ${ld_dest}/plugin"
 #Run "cp ${ld_base}/VERSION ${ld_dest}/"
 case "${l_shell}" in
-    bash|ksh )
-               grep "^\. ~/.git-info-bar/plugin" ${HOME}/${l_profile} 1>/dev/null
-               if [[ $? -ne 0 ]]; then
-                   echo ". ~/.git-info-bar/plugin" >>${HOME}/${l_profile}
-                   if [[ $? -ne 0 ]]; then
-                       printf "FAILED!\nERROR: $1\n${l_out}"
-                       exit 101
-                   fi
-               fi
-               ;;
+    bash|ksh|sh )
+                  grep "^\. ~/.git-info-bar/plugin" ${HOME}/${l_profile} 1>/dev/null
+                  if [[ $? -ne 0 ]]; then
+                      echo ". ~/.git-info-bar/plugin" >>${HOME}/${l_profile}
+                      if [[ $? -ne 0 ]]; then
+                          printf "FAILED!\nERROR: $1\n${l_out}"
+                          exit 101
+                      fi
+                  fi
+                  ;;
 
-    zsh      ) l_profile=".zshrc"
-               echo "Unsupported shell (${l_shell}) - try bash or ksh"
-               exit 101
-               ;;
+    zsh         ) l_profile=".zshrc"
+                  echo "Unsupported shell (${l_shell}) - try bash, ksh93 or gitbash"
+                  exit 101
+                  ;;
 
-    *        ) echo "Unsupported shell (${l_shell}) - try bash or ksh"
-               exit 101;
-               ;;
+    *           ) echo "Unsupported shell (${l_shell}) - try bash, ksh93 or gitbash"
+                  exit 101;
+                  ;;
 esac
 echo DONE
 
-printf "Installation is finished!
+printf "
+git-info-bar (v${l_version}) installation completed successfully!
 
 Please run the following command to begin using git-info-bar:
 

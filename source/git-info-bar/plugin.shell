@@ -68,14 +68,23 @@ function Func_GitCheck {
 
     l_msg="${l_inf}${l_msg}"
 
-    l_stash_cnt=$(git stash list | wc -l)
+    l_stash_cnt=$(git stash list | wc -l | awk '{print $NF}')
     if [[ ${l_stash_cnt} -gt 0 ]]; then
         l_msg="${l_msg} / ${l_int}${l_blubg}STASHES: ${l_stash_cnt}${l_blufg}"
     fi
 
     #- Print the 'Info Bar'
     #-----------------------
-    printf "\n${l_hlt}"; printf -vch "%${COLUMNS}s" "" 2>/dev/null; printf "%s" "${ch// / }"; printf "${l_rst}\r"
+    l_columns=
+    if [[ ${COLUMNS} != "" ]]; then
+        l_columns=${COLUMNS}
+    else
+        l_columns=0
+    fi
+    echo
+    if [[ ! ${OS} ]]; then
+        printf "${l_hlt}"; printf -vch "%${COLUMNS}s" "" 2>/dev/null; printf "%s" "${ch// / }"; printf "${l_rst}\r"
+    fi
     printf "${l_hlt}  BRANCH: ${l_git_branch}  (${l_git_sha1})${l_msg}  ${l_rst}\n\$ "
 
 }

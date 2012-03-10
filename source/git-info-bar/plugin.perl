@@ -33,8 +33,18 @@ function Func_GitCheck {
 use strict;
 use 5.4.0;
 
-eval { use Term::ReadKey; };
-my ( $l_columns, @la_other ) = ( $@ ) ? (0,0) : ( GetTerminalSize() );
+my ( $l_columns, @la_other );
+
+#foreach ( sort keys %{ENV} ) {
+#  print qq(ENV: $_ = $ENV{"$_"}\n);
+#}
+
+if ( $ENV{'OS'} && $ENV{'OS'} =~ /Windows/i ) {
+    $l_columns = $ENV{'COLUMNS'} || 0;  #gitbash for MS Windows integration
+} else {
+    eval { use Term::ReadKey; };
+    ( $l_columns, @la_other ) = ( $@ ) ? (0,0) : ( GetTerminalSize() );
+}
 
 #- Get the current branch
 #-------------------------
@@ -51,7 +61,7 @@ my $l_maj ="\033[41;37m"; #(major info)   red background/white foreground
 my $l_rst ="\033[m";      #(reset)        original terminal colors
 my $l_msg = "";
 
-if ( ${l_git_branch} == "master" ) {
+if ( ${l_git_branch} eq "master" ) {
     $l_git_branch = "${l_maj}${l_git_branch}${l_hlt}";
 } else {
     $l_git_branch = "${l_blufg}${l_git_branch}${l_hlt}";
@@ -83,7 +93,7 @@ $l_msg = "${l_inf}${l_msg}";
 
 #- Show STASH stack count, if there is a stash
 #----------------------------------------------
-my $l_stash_cnt = qx(git stash list | wc -l);
+my $l_stash_cnt = qx(git stash list | wc -l | awk '{print \$NF}');
 chomp( $l_stash_cnt );
 if ( ${l_stash_cnt} gt 0 ) {
     $l_msg = "${l_msg} / ${l_int}${l_blubg}STASHES: ${l_stash_cnt}${l_blufg}";
