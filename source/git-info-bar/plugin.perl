@@ -42,7 +42,7 @@ my ( $l_columns, @la_other );
 if ( $ENV{'OS'} && $ENV{'OS'} =~ /Windows/i ) {
     $l_columns = $ENV{'COLUMNS'} || 0;  #gitbash for MS Windows integration
 } else {
-    eval { use Term::ReadKey; };
+    eval "use Term::ReadKey";
     ( $l_columns, @la_other ) = ( $@ ) ? (0,0) : ( GetTerminalSize() );
 }
 
