@@ -117,8 +117,8 @@ fi
 for l_profile in .bashrc .profile
 do
     case "${l_shell}" in
-        bash|ksh|sh ) #- We allow bash, ksh and gitbash, currently
-                      #--------------------------------------------
+        bash|ksh|sh ) #- We allow bash, ksh93 and gitbash, currently
+                      #----------------------------------------------
                       ;;
 
         zsh         ) printf "FAILED!\n  Unsupported shell (${l_shell}) - try bash, ksh93 or gitbash.\n"
@@ -129,9 +129,10 @@ do
                       exit 101;
                       ;;
     esac
-    if [[ ${SHELL} == "sh" && ${l_profile} == ".profile" ]]; then
-        continue  #don't integrate for bourne shell, not supported
-    fi
+#- gitbash uses 'sh', but is really bash
+#    if [[ ${SHELL} == "sh" && ${l_profile} == ".profile" ]]; then
+#        continue  #don't integrate for bourne shell, not supported
+#    fi
     if [[ ${l_profile} == ".profile" ]]; then
         which ksh 1>/dev/null 2>&1
         if [[ $? -ne 0 ]]; then
