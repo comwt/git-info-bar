@@ -143,9 +143,9 @@ do
             fi
         fi
     fi
-    grep "^\. ~/.git-info-bar/plugin" ${HOME}/${l_profile} 1>/dev/null
+    grep "~/.git-info-bar/plugin" ${HOME}/${l_profile} 1>/dev/null
     if [[ $? -ne 0 ]]; then
-        echo ". ~/.git-info-bar/plugin" >>${HOME}/${l_profile}
+        echo "if [[ -s \$TERM ]]; then . ~/.git-info-bar/plugin; fi" >>${HOME}/${l_profile}
         if [[ $? -ne 0 ]]; then
             printf "FAILED!\nERROR: $1\n${l_out}"
             exit 101
