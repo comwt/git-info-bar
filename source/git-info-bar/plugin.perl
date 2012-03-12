@@ -102,7 +102,7 @@ if ( ${l_stash_cnt} gt 0 ) {
 #- Print the 'Info Bar'
 #-----------------------
 print "\n${l_hlt}" . " "x${l_columns} . "${l_rst}\r"
-    . "${l_hlt}  BRANCH: ${l_git_branch}  (${l_git_sha1})${l_msg}  ${l_rst}\n\$ ";
+    . "${l_hlt}  ${l_int}BRANCH:${l_rst}${l_hlt} ${l_git_branch}  (${l_git_sha1})${l_msg}  ${l_rst}\n\$ ";
 EOF
 
 }

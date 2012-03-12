@@ -87,6 +87,7 @@ else
         fi
     fi
 fi
+ld_dest="${HOME}/.git-info-bar"
 
 l_version=`awk '{print $1}' VERSION`
 printf "[INFO] Installing git-info-bar (version ${l_version}) ... "

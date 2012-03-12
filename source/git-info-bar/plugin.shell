@@ -85,7 +85,7 @@ function Func_GitCheck {
     if [[ ! ${OS} ]]; then
         printf "${l_hlt}"; printf -vch "%${COLUMNS}s" "" 2>/dev/null; printf "%s" "${ch// / }"; printf "${l_rst}\r"
     fi
-    printf "${l_hlt}  BRANCH: ${l_git_branch}  (${l_git_sha1})${l_msg}  ${l_rst}\n\$ "
+    printf "${l_hlt}  ${l_int}BRANCH:${l_rst}${l_hlt} ${l_git_branch}  (${l_git_sha1})${l_msg}  ${l_rst}\n\$ "
 
 }
 
