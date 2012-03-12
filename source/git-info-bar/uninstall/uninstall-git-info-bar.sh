@@ -37,6 +37,9 @@ ld_base=$PWD
 
 for l_profile in .bashrc .profile .zshrc
 do
+    if [[ ! -f "${HOME}/${l_profile}" ]]; then
+        continue #shell RC script not found, skip 
+    fi
     l_previous_version=$(awk '/BASH-GIT-VERSION/ {print $3}' ${HOME}/${l_profile})
     if [[ ${l_previous_version} != "" ]]; then
         printf "Removing bash-git references from ~/${l_profile} ... "
