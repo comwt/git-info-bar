@@ -35,34 +35,67 @@ ld_base=$PWD
 
 . ${ld_base}/../lib/shell/global_functions
 
-l_previous_version=$(awk '/BASH-GIT-VERSION/ {print $3}' ${HOME}/.bashrc)
-if [[ ${l_previous_version} == '1.0.0' ]]; then
-    echo "Version 1.0.0 is installed.  Aborting."
-    exit 100
-fi
-if [ -f "${HOME}/.bash-git/VERSION" ]; then
-    echo "Version 1.0.1 is installed.  Aborting."
-    exit 100
-fi
-if [ ! -f "${HOME}/.git-info-bar/VERSION" ]; then
-    echo "git-info-bar does not appear to be installed."
-    exit 0
+for l_profile in .bashrc .profile .zshrc
+do
+    l_previous_version=$(awk '/BASH-GIT-VERSION/ {print $3}' ${HOME}/${l_profile})
+    if [[ ${l_previous_version} != "" ]]; then
+        printf "Removing bash-git references from ~/${l_profile} ... "
+        l_out=`sed '/#BASH-GIT$/d' ${HOME}/${l_profile} >${ld_base}/profile.sed.out`
+        if [[ $? -ne 0 ]]; then
+            printf "FAILED!\nERROR: $1\n${l_out}"
+            exit 101
+        fi
+        Run "cp ${ld_base}/profile.sed.out ${HOME}/${l_profile}"
+        Run "rm ${ld_base}/profile.sed.out"
+        echo DONE
+        continue;  #try the next file, in case multiple shells are integrated
+    fi
+
+    l_bash_git_count=$(grep -ic "bash-git\/plugin" ${HOME}/${l_profile})
+    if [[ ${l_bash_git_count} -gt 0 ]]; then
+        printf "Removing bash-git references from ~/${l_profile} ... "
+        l_out=`sed '/bash-git\/plugin/d' ${HOME}/${l_profile} >${ld_base}/profile.sed.out`
+        Run "cp ${ld_base}/profile.sed.out ${HOME}/${l_profile}"
+        if [[ $? -ne 0 ]]; then
+            printf "FAILED!\nERROR: $1\n${l_out}"
+            exit 101
+        fi
+        Run "rm ${ld_base}/profile.sed.out"
+        echo DONE
+        continue;  #try the next file, in case multiple shells are integrated
+    fi
+
+    l_git_info_bar_count=$(grep -ic "git-info-bar\/plugin" ${HOME}/${l_profile})
+    if [[ ${l_git_info_bar_count} -gt 0 ]]; then
+        printf "Removing git-info-bar references from ~/${l_profile} ... "
+        l_out=`sed '/git-info-bar\/plugin/d' ${HOME}/${l_profile} >${ld_base}/profile.sed.out`
+        Run "cp ${ld_base}/profile.sed.out ${HOME}/${l_profile}"
+        if [[ $? -ne 0 ]]; then
+            printf "FAILED!\nERROR: $1\n${l_out}"
+            exit 101
+        fi
+        Run "rm ${ld_base}/profile.sed.out"
+        echo DONE
+        continue;  #try the next file, in case multiple shells are integrated
+    fi
+done
+
+if [[ -d "${HOME}/.bash-git" ]]; then
+    l_installed_version=$(cat ${HOME}/.bash-git/VERSION 2>/dev/null)
+    printf "Removing directory ~/.bash-git ... "
+    if [[ ${l_installed_version} == "1.0.1" ]]; then
+        Run "rm -fr ${HOME}/.bash-git"
+        echo DONE
+    else
+        printf "\033[7mBYPASSED!\033[0m\n  Expected ~/.bash-git/VERSION to contain '1.0.1'.\n  If you know that you do not need that directory, please remove it by hand.\n"
+    fi
 fi
 
-l_previous_version=$(awk '{print $1}' ${HOME}/.git-info-bar/VERSION)
-
-printf "Removing git-info-bar version ${l_previous_version} ... "
-if [ -d "${HOME}/.git-info-bar" ]; then
+if [[ -d "${HOME}/.git-info-bar" ]]; then
+    printf "Removing directory ~/.git-info-bar ... "
     Run "rm -fr ${HOME}/.git-info-bar"
+    echo DONE
 fi
-l_out=`sed '/git-info-bar\/plugin/d' ${HOME}/.bashrc >${ld_base}/bashrc.sed.out`
-Run "cp ${ld_base}/bashrc.sed.out ${HOME}/.bashrc"
-if [[ $? -ne 0 ]]; then
-    printf "FAILED!\nERROR: $1\n${l_out}"
-    exit 101
-fi
-Run "rm ${ld_base}/bashrc.sed.out"
-echo DONE
 
 exit 0
 
