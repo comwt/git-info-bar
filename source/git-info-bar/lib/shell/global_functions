@@ -39,11 +39,7 @@ function Uninstall {
         echo "Aborted."
         exit 100
     fi
-    if [[ $1 == '1.0.0' || $1 == '1.0.1' ]]; then
-        ${ld_base}/uninstall/uninstall-v$1.sh
-    else
-        ${ld_base}/uninstall/uninstall-git-info-bar.sh
-    fi
+    ${ld_base}/uninstall/uninstall-git-info-bar.sh
     if [[ $? -ne 0 ]]; then
         printf "Sorry, there was an error uninstalling the previous version.\nPlease remove it by hand.\n"
         exit 0
