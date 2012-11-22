@@ -4,8 +4,9 @@ git-info-bar is a shell plugin that endeavors to provide a fast and pronounced (
     - current cksum (in 'red' if there are uncommitted changes and
       displays an 'uncommitted changes' message in the message area)
     - stash count in the message area if you have stashes
-    - git bash, git ksh, git sh, git zsh, gitbash, git shell plugin
 
 The info bar is only displayed when you are in a git repository's path.
 
 Please see the license under source/git-info-bar.
+
+KEYWORDS: git bash, git ksh, git sh, git zsh, gitbash, git shell plugin
