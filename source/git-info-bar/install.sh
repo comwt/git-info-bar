@@ -67,7 +67,6 @@ case "${l_shell}" in
     zsh    ) l_effective_profile=".zshrc"   ;;
 esac
 
-
 l_new_version=$(cat VERSION)
 printf "This will remove any previous versions of git-info-bar\nand install version ${l_new_version}.  Proceed? (y/n): "
 read l_answ
@@ -92,9 +91,6 @@ if [[ ! -d "${ld_dest}" ]]; then
         exit 101
     fi
 fi
-#if [[ ! -d "${ld_dest}" ]]; then
-#    Run "mkdir ${ld_dest}"
-#fi
 l_out=$(cp ${ld_base}/License ${ld_dest}/)
 if [[ $? -ne 0 ]]; then
     printf "FAILED!\nERROR: $1\n${l_out}"
@@ -110,14 +106,12 @@ if [[ $? -ne 0 ]]; then
     printf "FAILED!\nERROR: $1\n${l_out}"
     exit 101
 fi
-#Run "cp ${ld_base}/License ${ld_dest}/"
-#Run "cp ${ld_base}/${lf_plugin} ${ld_dest}/plugin"
-#Run "cp ${ld_base}/VERSION ${ld_dest}/"
 
 for l_profile in .bashrc .profile
 do
     case "${l_shell}" in
         bash|ksh|sh ) #- We allow bash, ksh93 and gitbash, currently
+                      #- gitbash uses 'sh', but is really bash
                       #----------------------------------------------
                       ;;
 
@@ -129,10 +123,6 @@ do
                       exit 101;
                       ;;
     esac
-#- gitbash uses 'sh', but is really bash
-#    if [[ ${SHELL} == "sh" && ${l_profile} == ".profile" ]]; then
-#        continue  #don't integrate for bourne shell, not supported
-#    fi
     if [[ ${l_profile} == ".profile" ]]; then
         which ksh 1>/dev/null 2>&1
         if [[ $? -ne 0 ]]; then

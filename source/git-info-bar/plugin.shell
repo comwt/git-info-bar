@@ -89,4 +89,5 @@ function Func_GitCheck {
 
 }
 
+export COLUMNS
 PS1="${PS1}\$(Func_GitCheck)"

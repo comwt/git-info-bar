@@ -35,16 +35,7 @@ use 5.4.0;
 
 my ( $l_columns, @la_other );
 
-#foreach ( sort keys %{ENV} ) {
-#  print qq(ENV: $_ = $ENV{"$_"}\n);
-#}
-
-if ( $ENV{'OS'} && $ENV{'OS'} =~ /Windows/i ) {
-    $l_columns = $ENV{'COLUMNS'} || 0;  #gitbash for MS Windows integration
-} else {
-    eval "use Term::ReadKey";
-    ( $l_columns, @la_other ) = ( $@ ) ? (0,0) : ( GetTerminalSize() );
-}
+$l_columns = $ENV{'COLUMNS'} || 0;
 
 #- Get the current branch
 #-------------------------
@@ -107,4 +98,5 @@ EOF
 
 }
 
+export COLUMNS
 PS1="${PS1}\$(Func_GitCheck)"
