@@ -1,4 +1,4 @@
-git-info-bar is a shell plugin that endeavors to provide a fast and pronounced (highly visible) view of various git attributes when you are under the umbrella of a git repository.  Its main feature, the 'info bar' (information bar), displays the following:
+git-info-bar is a Git shell plugin that endeavors to provide a fast and pronounced (highly visible) view of various git attributes when you are under the umbrella of a git repository.  Its main feature, the 'info bar' (information bar), displays the following:
 
     - current branch (in 'red' if on master)
     - current cksum (in 'red' if there are uncommitted changes and
