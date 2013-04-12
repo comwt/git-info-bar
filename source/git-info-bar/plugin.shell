@@ -53,7 +53,17 @@ function Func_GitCheck {
 
     l_git_sha1=$(git branch --verbose 2>/dev/null|awk '$1 == "*" {print $3}')
 
-    l_changes=$(git status --porcelain 2>/dev/null | wc -l)
+    #- If you need more speedy responses on large repositories, this is where
+    #  you need to look.  git status takes much longer than the other commands.
+    #- The --porcelain option to 'git status' was added in version 1.7.0.
+    #---------------------------------------------------------------------------
+    git version 2>/dev/null | grep -c -E "version (0|1\.[0123456])" 1>/dev/null 2>&1
+    l_use_porcelain_TF=$?
+    if [[ ${l_use_porcelain_TF} ]]; then
+        l_changes=$(git status --porcelain 2>/dev/null | wc -l)
+    else
+        l_changes=$(git status 2>/dev/null | awk '/^#\t/ {print}' 2>/dev/null | wc -l)
+    fi
     if [[ ${l_changes} -ne 0 ]]; then
         l_git_sha1="${l_maj}${l_git_sha1}${l_hlt}"
         l_msg="${l_msg} / ${l_changes} uncommitted"

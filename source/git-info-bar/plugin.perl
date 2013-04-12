@@ -65,8 +65,15 @@ chomp( $l_git_sha1 );
 
 #- If you need more speedy responses on large repositories, this is where
 #  you need to look.  git status takes much longer than the other commands.
+#- The --porcelain option to 'git status' was added in version 1.7.0.
 #---------------------------------------------------------------------------
-my $l_changes = qx(git status --porcelain 2>/dev/null | wc -l);
+my $l_changes;
+my $l_use_porcelain_TF = ( qx(git version) =~ /version (?:0|1\.[0-6])/ ) ? 0 : 1;
+if ( ${l_use_porcelain_TF} ) {
+    $l_changes = qx(git status --porcelain 2>/dev/null | wc -l);
+} else {
+    $l_changes = qx(git status 2>/dev/null | awk '/^#\t/ {print}' 2>/dev/null | wc -l);
+}
 chomp( $l_changes );
 if ( ${l_changes} ne 0 ) {
     $l_git_sha1 = "${l_maj}${l_git_sha1}${l_hlt}";
