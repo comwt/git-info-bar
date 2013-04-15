@@ -33,7 +33,7 @@ function Uninstall {
 #    set -x
     l_new_version=$(cat VERSION)
     echo "Found git-info-bar (version: $1)"
-    printf "Are you sure you want to update it to version ${l_new_version}? (y/n): "
+    printf "Are you sure you want to remove git-info-bar version ${l_new_version}? (y/n): "
     read l_answ
     if [[ $(echo ${l_answ} | grep -c -i "^y") -lt 1 ]]; then
         echo "Aborted."

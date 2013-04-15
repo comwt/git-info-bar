@@ -35,6 +35,16 @@ lf_plugin=
 l_shell=`echo ${SHELL} | awk -F'/' '{print $NF}'`
 
 printf "\n\n"
+if [[ $(echo $* | grep -ci -- -h) -ne 0 ]]; then
+    echo "USAGE:  $0 [OPTIONS]
+
+  -f    Force the installation; do not prompt for confirmation
+
+  -h    Display this help message and then quit
+
+"
+    exit 0
+fi
 
 l_out=`/usr/bin/env perl -e 'use 5.4.0'` #require minimum of Perl 5.4
 #l_out=`fakecmd123` #require minimum of Perl 5.4
@@ -68,11 +78,13 @@ case "${l_shell}" in
 esac
 
 l_new_version=$(cat VERSION)
-printf "This will remove any previous versions of git-info-bar\nand install version ${l_new_version}.  Proceed? (y/n): "
-read l_answ
-if [[ $(echo ${l_answ} | grep -c -i "^y") -lt 1 ]]; then
-    echo "Aborted."
-    exit 100
+if [[ $(echo $1 | grep -ci -- -f) -eq 0 ]]; then
+    printf "This will remove any previous versions of git-info-bar\nand install version ${l_new_version}.  Proceed? (y/n): "
+    read l_answ
+    if [[ $(echo ${l_answ} | grep -c -i "^y") -lt 1 ]]; then
+        echo "Aborted."
+        exit 100
+    fi
 fi
 ${ld_base}/uninstall/uninstall-git-info-bar.sh
 if [[ $? -ne 0 ]]; then
