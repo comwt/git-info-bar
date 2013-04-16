@@ -29,6 +29,8 @@
 ################################################################################
 function Func_GitCheck {
 
+export GITPS1=$(__git_ps1)
+
 /usr/bin/env perl <<'EOF'
 use strict;
 use 5.4.0;
@@ -39,9 +41,8 @@ $l_columns = $ENV{'COLUMNS'} || 0;
 
 #- Get the current branch
 #-------------------------
-my $l_git_branch = qx(git branch 2>/dev/null|awk '\$1 == "*" {print \$2}');
-exit if ( ! ${l_git_branch} );
-chomp( $l_git_branch );
+$ENV{'GITPS1'} =~ /\((.+)\)/ || exit;
+my $l_git_branch = $1;
 
 my $l_hlt ="\033[30;47m"; #(highlight)    white background/black foreground
 my $l_inf ="\033[31m";    #(message info) red foreground
@@ -62,6 +63,9 @@ if ( ${l_git_branch} eq "master" ) {
 #------------------------------
 my $l_git_sha1 = qx(git branch --verbose 2>/dev/null|awk '\$1 == "*" {print \$3}');
 chomp( $l_git_sha1 );
+if ( ! ${l_git_sha1} ) {
+    $l_git_sha1 = 'stateless';
+}
 
 #- If you need more speedy responses on large repositories, this is where
 #  you need to look.  git status takes much longer than the other commands.
