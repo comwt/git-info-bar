@@ -31,7 +31,6 @@
 function Func_GitCheck {
 
     l_git_branch=$(__git_ps1 | awk -F\( '{print $2}' | awk -F\) '{print $1}')
-#    l_git_branch=$(git branch 2>/dev/null|awk '$1 == "*" {print $2}')
 
     if [[ ${l_git_branch} == "" ]]; then
         return
