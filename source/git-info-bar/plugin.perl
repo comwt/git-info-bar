@@ -30,6 +30,7 @@
 function Func_GitCheck {
 
 export GITPS1=$(__git_ps1)
+export COLUMNS
 
 /usr/bin/env perl <<'EOF'
 use strict;
