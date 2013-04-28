@@ -29,21 +29,39 @@
 ################################################################################
 function Func_GitCheck {
 
-export GITPS1=$(__git_ps1)
-export COLUMNS
+    export COLUMNS
 
-/usr/bin/env perl <<'EOF'
+    /usr/bin/env perl <<'EOF'
 use strict;
 use 5.4.0;
 
-my ( $l_columns, @la_other );
+my $l_columns = $ENV{'COLUMNS'} || 0;
 
-$l_columns = $ENV{'COLUMNS'} || 0;
+#- Get the current branch and sha1 cksum all in one blow
+#---------------------------------------------------------
+my $l_out = qx(git branch --verbose 2>/dev/null | grep ^\*);
+$l_out =~ /^\*\s+(.*?)\s+([a-z0-9]+)/i;
+my ( $l_git_branch, $l_git_sha1 ) = ( $1, $2 );
 
-#- Get the current branch
-#-------------------------
-$ENV{'GITPS1'} =~ /\((.+)\)/ || exit;
-my $l_git_branch = $1;
+if ( ! ${l_git_branch} ) {
+    GIT_CHECK: {
+        my $l_dir = $ENV{"PWD"};
+        $l_dir =~ s/[\\\/]$//;
+        LOOP_A: {
+            do {
+                last GIT_CHECK if ( -e "${l_dir}/.git/config" );
+                last LOOP_A if ( ! $l_dir );
+                if ( $l_dir =~ /^([\\\/].+?)[\\\/].*$/ ) {
+                    $l_dir = $1;
+                } elsif ( $l_dir =~ /^[\\\/].+?/ ) {
+                    $l_dir = "";
+                }
+            } while ( 1 );
+        }
+        exit; #not a repo, quit
+    }
+    #- this directory is part of a Git repository if we get here
+}
 
 my $l_hlt ="\033[30;47m"; #(highlight)    white background/black foreground
 my $l_inf ="\033[31m";    #(message info) red foreground
@@ -62,25 +80,26 @@ if ( ${l_git_branch} eq "master" ) {
 
 #- Get the branches SHA1 cksum
 #------------------------------
-my $l_git_sha1 = qx(git branch --verbose 2>/dev/null|awk '\$1 == "*" {print \$3}');
-chomp( $l_git_sha1 );
 if ( ! ${l_git_sha1} ) {
     $l_git_sha1 = 'stateless';
 }
 
 #- If you need more speedy responses on large repositories, this is where
 #  you need to look.  git status takes much longer than the other commands.
-#- The --porcelain option to 'git status' was added in version 1.7.0.
+#- The --porcelain option to 'git status' was added in Git version 1.7.0.
 #---------------------------------------------------------------------------
 my $l_changes;
 my $l_use_porcelain_TF = ( qx(git version) =~ /version (?:0|1\.[0-6])/ ) ? 0 : 1;
 if ( ${l_use_porcelain_TF} ) {
     $l_changes = qx(git status --porcelain 2>/dev/null | wc -l);
 } else {
-    $l_changes = qx(git status 2>/dev/null | awk '/^#\t/ {print}' 2>/dev/null | wc -l);
+    foreach ( qx(git status 2>/dev/null) ) {
+        $l_changes++ if ( /^#\t/ );
+    }
 }
 chomp( $l_changes );
-if ( ${l_changes} ne 0 ) {
+$l_changes =~ s/^.*?(\d+)/$1/;
+if ( ${l_changes} ) {
     $l_git_sha1 = "${l_maj}${l_git_sha1}${l_hlt}";
     $l_msg = "${l_msg} / ${l_changes} uncommitted";
     if ( ${l_changes} eq 1 ) {
@@ -96,8 +115,9 @@ $l_msg = "${l_inf}${l_msg}";
 
 #- Show STASH stack count, if there is a stash
 #----------------------------------------------
-my $l_stash_cnt = qx(git stash list | wc -l | awk '{print \$NF}');
+my $l_stash_cnt = qx(git stash list | wc -l);
 chomp( $l_stash_cnt );
+$l_stash_cnt = ( split( "\s", $l_stash_cnt ) )[$l_stash_cnt];
 if ( ${l_stash_cnt} gt 0 ) {
     $l_msg = "${l_msg} / ${l_int}${l_blubg}STASHES: ${l_stash_cnt}${l_blufg}";
 }
