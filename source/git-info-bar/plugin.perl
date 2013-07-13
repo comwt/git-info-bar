@@ -117,8 +117,8 @@ $l_msg = "${l_inf}${l_msg}";
 #----------------------------------------------
 my $l_stash_cnt = qx(git stash list | wc -l);
 chomp( $l_stash_cnt );
-$l_stash_cnt = ( split( "\s", $l_stash_cnt ) )[$l_stash_cnt];
-if ( ${l_stash_cnt} gt 0 ) {
+$l_stash_cnt =~ s/.*(\d+)$/$1/;
+if ( ${l_stash_cnt} > 0 ) {
     $l_msg = "${l_msg} / ${l_int}${l_blubg}STASHES: ${l_stash_cnt}${l_blufg}";
 }
 
