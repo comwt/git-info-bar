@@ -115,11 +115,9 @@ $l_msg = "${l_inf}${l_msg}";
 
 #- Show STASH stack count, if there is a stash
 #----------------------------------------------
-my $l_stash_cnt = qx(git stash list | wc -l);
-chomp( $l_stash_cnt );
-$l_stash_cnt =~ s/.*(\d+)$/$1/;
-if ( ${l_stash_cnt} > 0 ) {
-    $l_msg = "${l_msg} / ${l_int}${l_blubg}STASHES: ${l_stash_cnt}${l_blufg}";
+my @la_stash = qx( git stash list 2>&1 3>&1 );
+if ( "@la_stash" !~ /fatal.*working tree/ && @la_stash ) {
+    $l_msg = "${l_msg} / ${l_int}${l_blubg}STASHES: " . scalar(@la_stash) . "${l_blufg}";
 }
 
 #- Print the 'Info Bar'

@@ -45,7 +45,7 @@ function Func_GitCheck {
     l_rst="\033[m"     #(reset)        original terminal colors
     l_msg=
 
-    if [[ ${l_git_branch} == "master" ]]; then
+    if [[ ${l_git_branch} == "master" || ${l_git_branch} == "GIT_DIR!" ]]; then
         l_git_branch="${l_maj}${l_git_branch}${l_hlt}"
     else
         l_git_branch="${l_blufg}${l_git_branch}${l_hlt}"
@@ -82,9 +82,12 @@ function Func_GitCheck {
 
     l_msg="${l_inf}${l_msg}"
 
-    l_stash_cnt=$(git stash list | wc -l | awk '{print $NF}')
-    if [[ ${l_stash_cnt} -gt 0 ]]; then
-        l_msg="${l_msg} / ${l_int}${l_blubg}STASHES: ${l_stash_cnt}${l_blufg}"
+    l_stash=$(git stash list 2>&1 3>&1)
+    if [[ $(echo ${l_stash} | grep -c "fatal.*working tree") -eq 0 && $l_stash != "" ]]; then
+        l_stash_cnt=$(echo ${l_stash} | wc -l | awk '{print $NF}')
+        if [[ ${l_stash_cnt} -gt 0 ]]; then
+            l_msg="${l_msg} / ${l_int}${l_blubg}STASHES: ${l_stash_cnt}${l_blufg}"
+        fi
     fi
 
     #- Print the 'Info Bar'
