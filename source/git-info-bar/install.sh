@@ -42,6 +42,9 @@ if [[ $(echo $* | grep -ci -- -h) -ne 0 ]]; then
 
   -h    Display this help message and then quit
 
+  -s    Update /etc/skel instead of your user home directory
+        (requires elevated user account)
+
 "
     exit 0
 fi
@@ -86,7 +89,12 @@ if [[ $(echo $1 | grep -ci -- -f) -eq 0 ]]; then
         exit 100
     fi
 fi
-${ld_base}/uninstall/uninstall-git-info-bar.sh
+
+if [[ $(echo $* | grep -ci -- -s) -ne 0 ]]; then
+  HOME="/etc/skel"
+fi
+
+${ld_base}/uninstall/uninstall-git-info-bar.sh $*
 if [[ $? -ne 0 ]]; then
     printf "Sorry, there was an error uninstalling the previous version.\nPlease remove it by hand.\n"
     exit 0
@@ -102,6 +110,11 @@ if [[ ! -d "${ld_dest}" ]]; then
         printf "FAILED!\nERROR: $1\n${l_out}"
         exit 101
     fi
+fi
+l_out=$(cp ${ld_base}/.git_profile ${ld_dest}/)
+if [[ $? -ne 0 ]]; then
+    printf "FAILED!\nERROR: $1\n${l_out}"
+    exit 101
 fi
 l_out=$(cp ${ld_base}/License ${ld_dest}/)
 if [[ $? -ne 0 ]]; then
@@ -145,9 +158,16 @@ do
             fi
         fi
     fi
-    grep "~/.git-info-bar/plugin" ${HOME}/${l_profile} 1>/dev/null
+    grep "${ld_dest}/plugin" ${HOME}/${l_profile} 1>/dev/null
     if [[ $? -ne 0 ]]; then
-        echo "if [[ \$TERM != '' ]]; then . ~/.git-info-bar/plugin; fi" >>${HOME}/${l_profile}
+        echo "if [[ \$TERM != '' ]]; then . ${ld_dest}/plugin; fi" >>${HOME}/${l_profile}
+        if [[ $? -ne 0 ]]; then
+            printf "FAILED!\nERROR: $1\n${l_out}"
+            exit 101
+        fi
+    fi
+    if [[ $(grep -ci "\.git_profile" ${HOME}/${l_profile}) -eq 0 ]]; then
+        echo "if [[ \$TERM != '' ]]; then . ${ld_dest}/.git_profile; fi" >>${HOME}/${l_profile}
         if [[ $? -ne 0 ]]; then
             printf "FAILED!\nERROR: $1\n${l_out}"
             exit 101
@@ -162,7 +182,7 @@ git-info-bar (v${l_version}) installation completed successfully!
 
 Please run the following command to begin using git-info-bar:
 
-    . ~/${l_effective_profile}
+    . ${HOME}/${l_effective_profile}
 
 Enjoy,
 ComWT (https://github.com/comwt/git-info-bar)

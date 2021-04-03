@@ -27,13 +27,30 @@
 
 #----------------------------------------------------------------------
 # NOTE: before release v1.1.0, git-info-bar was know as 'bash-git' and
-#       the plugin was installed under ~/.bash-git
+#       the plugin was installed under ${HOME}/.bash-git
 #----------------------------------------------------------------------
 
 cd $(dirname $0)
 ld_base=$PWD
 
 . ${ld_base}/../lib/shell/global_functions
+
+printf "\n\n"
+if [[ $(echo $* | grep -ci -- -h) -ne 0 ]]; then
+    echo "USAGE:  $0 [OPTIONS]
+
+  -h    Display this help message and then quit
+
+  -s    Uninstall from /etc/skel instead of your user home directory
+        (requires elevated user account)
+
+"
+    exit 0
+fi
+
+if [[ $(echo $* | grep -ci -- -s) -ne 0 ]]; then
+  HOME="/etc/skel"
+fi
 
 for l_profile in .bashrc .profile .zshrc
 do
@@ -42,7 +59,7 @@ do
     fi
     l_previous_version=$(awk '/BASH-GIT-VERSION/ {print $3}' ${HOME}/${l_profile})
     if [[ ${l_previous_version} != "" ]]; then
-        printf "Removing bash-git references from ~/${l_profile} ... "
+        printf "Removing bash-git references from ${HOME}/${l_profile} ... "
         l_out=`sed '/#BASH-GIT$/d' ${HOME}/${l_profile} >${ld_base}/profile.sed.out`
         if [[ $? -ne 0 ]]; then
             printf "FAILED!\nERROR: $1\n${l_out}"
@@ -56,7 +73,7 @@ do
 
     l_bash_git_count=$(grep -ic "bash-git\/plugin" ${HOME}/${l_profile})
     if [[ ${l_bash_git_count} -gt 0 ]]; then
-        printf "Removing bash-git references from ~/${l_profile} ... "
+        printf "Removing bash-git references from ${HOME}/${l_profile} ... "
         l_out=`sed '/bash-git\/plugin/d' ${HOME}/${l_profile} >${ld_base}/profile.sed.out`
         Run "cp ${ld_base}/profile.sed.out ${HOME}/${l_profile}"
         if [[ $? -ne 0 ]]; then
@@ -70,7 +87,7 @@ do
 
     l_git_info_bar_count=$(grep -ic "git-info-bar\/plugin" ${HOME}/${l_profile})
     if [[ ${l_git_info_bar_count} -gt 0 ]]; then
-        printf "Removing git-info-bar references from ~/${l_profile} ... "
+        printf "Removing git-info-bar references from ${HOME}/${l_profile} ... "
         l_out=`sed '/git-info-bar\/plugin/d' ${HOME}/${l_profile} >${ld_base}/profile.sed.out`
         Run "cp ${ld_base}/profile.sed.out ${HOME}/${l_profile}"
         if [[ $? -ne 0 ]]; then
@@ -85,17 +102,17 @@ done
 
 if [[ -d "${HOME}/.bash-git" ]]; then
     l_installed_version=$(cat ${HOME}/.bash-git/VERSION 2>/dev/null)
-    printf "Removing directory ~/.bash-git ... "
+    printf "Removing directory ${HOME}/.bash-git ... "
     if [[ ${l_installed_version} == "1.0.1" ]]; then
         Run "rm -fr ${HOME}/.bash-git"
         echo DONE
     else
-        printf "\033[7mBYPASSED!\033[0m\n  Expected ~/.bash-git/VERSION to contain '1.0.1'.\n  If you know that you do not need that directory, please remove it by hand.\n"
+        printf "\033[7mBYPASSED!\033[0m\n  Expected ${HOME}/.bash-git/VERSION to contain '1.0.1'.\n  If you know that you do not need that directory, please remove it by hand.\n"
     fi
 fi
 
 if [[ -d "${HOME}/.git-info-bar" ]]; then
-    printf "Removing directory ~/.git-info-bar ... "
+    printf "Removing directory ${HOME}/.git-info-bar ... "
     Run "rm -fr ${HOME}/.git-info-bar"
     echo DONE
 fi
