@@ -1,0 +1,12 @@
+# some useful git aliases
+alias gc="git checkout"
+alias gcb="git checkout -b"
+alias gcd="git checkout dev"
+alias gcm="git checkout master"
+alias gl="git log"
+alias gp="git pull"
+alias gpom="git pull origin master"
+alias gr="git rebase"
+alias gri="git rebase -i"
+alias gs="git status"
+alias gsha="git branch --verbose"
