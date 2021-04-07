@@ -6,7 +6,7 @@
 #
 # Purpose    : Provides a Git 'info bar' (information bar) when you are under
 #              a git repository.  It displays the following information:
-#                - current branch (in 'red' if on master)
+#                - current branch (in 'red' if on main or master)
 #                - current cksum (in 'red' if there are uncommitted changes
 #                  and displays an 'uncommitted changes' message in the message
 #                  area)
@@ -72,7 +72,7 @@ my $l_maj ="\033[41;37m"; #(major info)   red background/white foreground
 my $l_rst ="\033[m";      #(reset)        original terminal colors
 my $l_msg = "";
 
-if ( ${l_git_branch} eq "master" ) {
+if ( ${l_git_branch} eq "main" || ${l_git_branch} eq "master" ) {
     $l_git_branch = "${l_maj}${l_git_branch}${l_hlt}";
 } else {
     $l_git_branch = "${l_blufg}${l_git_branch}${l_hlt}";
