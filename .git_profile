@@ -1,11 +1,19 @@
+function getTrunkName {
+  if [[ $(gsha | cut -c2-7) == " main " ]]; then
+    echo main
+  else
+    echo master
+  fi
+}
+
 # some useful git aliases
 alias gc="git checkout"
 alias gcb="git checkout -b"
 alias gcd="git checkout dev"
-alias gcm="git checkout master"
+alias gcm="git checkout \$(getTrunkName)"
 alias gl="git log"
 alias gp="git pull"
-alias gpom="git pull origin master"
+alias gpom="git pull origin \$(getTrunkName)"
 alias gr="git rebase"
 alias gri="git rebase -i"
 alias gs="git status"
